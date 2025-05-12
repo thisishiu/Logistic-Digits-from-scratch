@@ -42,7 +42,7 @@ class App:
         self.reset_button = tk.Button(self.button_frame, text="Reset", command=self.clear)
         self.reset_button.pack(side=tk.LEFT)
 
-        self.result_label = tk.Label(self.root, text="Vẽ một số rồi nhấn OK", font=('Arial', 14))
+        self.result_label = tk.Label(self.root, text="Draw and press OK", font=('Arial', 14))
         self.result_label.pack()
 
         self.image = Image.new("L", (self.canvas_size, self.canvas_size), color=255)
@@ -59,7 +59,7 @@ class App:
     def clear(self):
         self.canvas.delete("all")
         self.draw.rectangle([0, 0, self.canvas_size, self.canvas_size], fill=255)
-        self.result_label.config(text="Vẽ một số rồi nhấn OK")
+        self.result_label.config(text="Draw and press OK")
 
     def predict(self):
         # Resize ảnh về 28x28
