@@ -49,7 +49,7 @@ class Z:
                 break
             previous_loss = loss_value
             self.weights -= learning_rate * dw(self.labels, y_hat, self.features)
-            if (epoch/epochs)*100 % 10:
+            if (epoch/epochs)*100 % 10 == 0:
                 print(f"Epoch {epoch}: Loss = {loss_value:.4f}")
             #     self.__log_loss.append([epoch, loss_value])
             #     self.__log_weights.append([epoch, self.weights.copy()])
