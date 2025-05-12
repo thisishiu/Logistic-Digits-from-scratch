@@ -31,19 +31,21 @@ class Z:
         self.features = np.hstack((np.ones((features.shape[0], 1)), features))
         self.labels = labels.reshape(-1, 1)
         self.weights = np.zeros((self.features.shape[1], 1))
-        # self.__log_weights = []       use if need to save log
+        # self.__log_weights = []      # use if need to save log
         # self.__log_loss = []
 
     def __repr__(self):
         return f"Z(features size={self.features.shape}, labels size={self.labels.shape}, weights shape={self.weights.shape})"
 
-    def train(self, learning_rate=0.1, epochs=10000):
+    def train(self, learning_rate=2, epochs=10000, decrease_lr=True):
+        s = epochs // 6
         previous_loss = float('inf')
         for epoch in range(epochs + 1):
+            if decrease_lr and epoch % s == 0 and epoch != 0:
+                learning_rate *= 0.5
             z = self.features @ self.weights
             y_hat = sigmoid(z)
             loss_value = loss(self.labels, y_hat)
-            # print(f"Epoch {epoch}: Loss = {loss_value:.4f}")
             if abs(loss_value - previous_loss) < 1e-8:
                 print(f"Loss converged at epoch {epoch}.")
                 break
@@ -51,8 +53,8 @@ class Z:
             self.weights -= learning_rate * dw(self.labels, y_hat, self.features)
             if (epoch/epochs)*100 % 10 == 0:
                 print(f"Epoch {epoch}: Loss = {loss_value:.4f}")
-            #     self.__log_loss.append([epoch, loss_value])
-            #     self.__log_weights.append([epoch, self.weights.copy()])
+                # self.__log_loss.append([epoch, loss_value])
+                # self.__log_weights.append([epoch, self.weights.copy()])
         print(f"Training completed after {epoch} epochs.")
 
 class MultinomialLogistic:
@@ -72,12 +74,12 @@ class MultinomialLogistic:
             models[category] = model
         return models
 
-    def train(self, learning_rate=0.1, epochs=10000):
+    def train(self, learning_rate=0.1, epochs=10000, decrease_lr=True):
         self.learning_rate = learning_rate
         self.epochs = epochs
         for category, model in self.models.items():
             print(f"Training for category {category}...")
-            model.train(learning_rate=self.learning_rate, epochs=self.epochs)
+            model.train(learning_rate=self.learning_rate, epochs=self.epochs, decrease_lr=decrease_lr)
         print("Training completed for all categories.")
 
     def softmax(self, x):

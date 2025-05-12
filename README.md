@@ -10,12 +10,12 @@ This project implements a **multiclass logistic regression model from scratch** 
 - Entirely based on NumPy and built from first principles.
 
 ## Project Structure
-.
-├── train.py    # Main script: load data, train model, export model
-├── scripts.py  # Core logic: logistic regression, training, prediction
-├── data/       # MNIST dataset files (.idx format)
-├── model.npz   # Saved model weights (after training)
-├── output.py   # Testing model (using weight in model.npz)
+.  
+├── train.py    # Main script: load data, train model, export model  
+├── scripts.py  # Core logic: logistic regression, training, prediction  
+├── data/       # MNIST dataset files (.idx format)  
+├── model.npz   # Saved model weights (after training)  
+├── output.py   # Testing model (using weight in model.npz)  
 └── README.md
 
 

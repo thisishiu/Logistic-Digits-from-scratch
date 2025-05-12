@@ -20,6 +20,7 @@ def read_idx(filename)-> np.ndarray:
         data = np.frombuffer(buffer=f.read(), dtype=data_type).reshape(size)
         return data
 
+# Read MNIST data
 images_1 = read_idx('data/t10k-images.idx3-ubyte')
 labels_1 = read_idx('data/t10k-labels.idx1-ubyte')
 images_2 = read_idx('data/train-images.idx3-ubyte')
@@ -31,7 +32,8 @@ print(f"Size of a single image: {images[0].shape}")
 print(f"Length of labels: {len(labels)}")
 print(f"Size of a single label: {labels[0].shape}")
 
-p = 1
+# Take p% of the data
+p = 0.3
 X = take_from(images, p)
 X = X.reshape(X.shape[0], -1)
 X = X / 255.0       # <---  Important step (normalize pixel values)
@@ -39,8 +41,9 @@ Y = take_from(labels, p)
 print(f"X shape: {X.shape}")
 print(f"Y shape: {Y.shape}")
 
+# Instantiate and train the model
 A = MultinomialLogistic(X, Y)
-A.train(0.05, 10000)  #<---- Can modify
+A.train(learning_rate=2, epochs=10000, decrease_lr=True)  #<---- Can modify
 A.to_file('model')
 
 
