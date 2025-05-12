@@ -2,14 +2,14 @@
 
 This project implements a **multiclass logistic regression model from scratch** using only NumPy. It is used to recognize handwritten digits (0–9) from the MNIST dataset.
 
-## 🧠 Key Features
+## Key Features
 
 - Implements binary and multiclass logistic regression without using any machine learning libraries.
 - Reads raw MNIST `.idx` files directly.
 - Supports training, prediction, accuracy evaluation, and model export (`.npz`).
 - Entirely based on NumPy and built from first principles.
 
-## 📁 Project Structure
+## Project Structure
 .
 ├── train.py    # Main script: load data, train model, export model
 ├── scripts.py  # Core logic: logistic regression, training, prediction
@@ -19,7 +19,7 @@ This project implements a **multiclass logistic regression model from scratch** 
 └── README.md
 
 
-## 📊 How It Works
+## How It Works
 
 ### 1. Data Loading
 The `read_idx()` function loads MNIST data from raw `.idx` files into NumPy arrays.
