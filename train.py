@@ -33,7 +33,7 @@ print(f"Length of labels: {len(labels)}")
 print(f"Size of a single label: {labels[0].shape}")
 
 # Take p% of the data
-p = 0.3
+p = 1
 X = take_from(images, p)
 X = X.reshape(X.shape[0], -1)
 X = X / 255.0       # <---  Important step (normalize pixel values)
