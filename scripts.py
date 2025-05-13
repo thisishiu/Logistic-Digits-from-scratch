@@ -1,6 +1,4 @@
-import numpy as np
-
-def take_from(block: np.ndarray, p: float) -> np.ndarray:
+def take_from(block, p):
     """
     Take first p% of the block.
     Args:
@@ -14,40 +12,42 @@ def take_from(block: np.ndarray, p: float) -> np.ndarray:
     n = int(len(block) * p)
     return block[:n]
 
-def sigmoid(z):
-    z = np.clip(z, -500, 500)
-    return 1 / (1 + np.exp(-z))
+def sigmoid(z, xp):
+    z = xp.clip(z, -500, 500)
+    return 1 / (1 + xp.exp(-z))
 
-def loss(y, y_hat):
+def loss(y, y_hat, xp):
     m = y.shape[0]
-    return -np.sum(y * np.log(y_hat + 1e-15) + (1 - y) * np.log(1 - y_hat + 1e-15)) / m
+    return -xp.sum(y * xp.log(y_hat + 1e-15) + (1 - y) * xp.log(1 - y_hat + 1e-15)) / m
 
 def dw(y, y_hat, X):
     m = y.shape[0]
     return X.T @ (y_hat - y) / m
 
 class Z:
-    def __init__(self, features, labels):
-        self.features = np.hstack((np.ones((features.shape[0], 1)), features))
+    def __init__(self, features, labels, xp):
+        self.xp = xp
+        self.features = xp.hstack((xp.ones((features.shape[0], 1)), features))
         self.labels = labels.reshape(-1, 1)
-        self.weights = np.zeros((self.features.shape[1], 1))
+        self.weights = xp.zeros((self.features.shape[1], 1))
         # self.__log_weights = []      # use if need to save log
         # self.__log_loss = []
 
     def __repr__(self):
         return f"Z(features size={self.features.shape}, labels size={self.labels.shape}, weights shape={self.weights.shape})"
 
-    def train(self, learning_rate=2, epochs=10000, decrease_lr=True):
-        s = epochs // 6
+    def train(self, learning_rate=2, epochs=10000):
+        print(f"Training with learning rate: {learning_rate}, epochs: {epochs} ({"GPU" if self.xp.__name__ == 'cupy' else 'CPU'})")
+        s = epochs // 2
         previous_loss = float('inf')
         for epoch in range(epochs + 1):
-            if decrease_lr and epoch % s == 0 and epoch != 0:
+            if epoch % s == 0 and epoch != 0:
                 learning_rate *= 0.5
             z = self.features @ self.weights
-            y_hat = sigmoid(z)
-            loss_value = loss(self.labels, y_hat)
+            y_hat = sigmoid(z, self.xp)
+            loss_value = loss(self.labels, y_hat, self.xp)
             if abs(loss_value - previous_loss) < 1e-8:
-                print(f"Loss converged at epoch {epoch}.")
+                print(f"Loss converged at epoch {epoch}: Loss = {loss_value:.4f}.")
                 break
             previous_loss = loss_value
             self.weights -= learning_rate * dw(self.labels, y_hat, self.features)
@@ -58,54 +58,44 @@ class Z:
         print(f"Training completed after {epoch} epochs.")
 
 class MultinomialLogistic:
-    def __init__(self, features, labels):
+    def __init__(self, features, labels, xp):
+        self.xp = xp
         self.features = features
         self.labels = labels
-        self.learning_rate = 0.1
-        self.epochs = 10000
-        self.categories = np.unique(labels)
+        self.categories = xp.unique(labels)
         self.models = self.__train_all_models()
 
     def __train_all_models(self):
         models = {}
         for category in self.categories:
             binary_labels = (self.labels == category).astype(float)
-            model = Z(self.features, binary_labels)
+            model = Z(self.features, binary_labels, self.xp)
             models[category] = model
         return models
 
-    def train(self, learning_rate=0.1, epochs=10000, decrease_lr=True):
+    def train(self, learning_rate=0.1, epochs=10000):
         self.learning_rate = learning_rate
         self.epochs = epochs
         for category, model in self.models.items():
             print(f"Training for category {category}...")
-            model.train(learning_rate=self.learning_rate, epochs=self.epochs, decrease_lr=decrease_lr)
+            model.train(learning_rate=self.learning_rate, epochs=self.epochs)
         print("Training completed for all categories.")
 
     def softmax(self, x):
-        x = np.hstack((np.ones((1, 1)), x))  # add bias term
-        scores = {c: sigmoid(x @ self.models[c].weights)[0, 0] for c in self.categories}
-        total = sum(np.exp(v) for v in scores.values())
-        softmax_scores = {c: np.exp(v) / total for c, v in scores.items()}
+        x = self.xp.hstack((np.ones((1, 1)), x))  # add bias term
+        scores = {c: sigmoid(x @ self.models[c].weights, self.xp)[0, 0] for c in self.categories}
+        total = sum(self.xp.exp(v) for v in scores.values())
+        softmax_scores = {c: self.xp.exp(v) / total for c, v in scores.items()}
         return softmax_scores
 
     def predict(self, x):
         probs = self.softmax(x.reshape(1, -1))
         return max(probs, key=probs.get), round(probs[max(probs, key=probs.get)] * 100, 2)
 
-    def accuracy(self, test_features, test_labels):
-        correct = 0
-        predict =[]
-        for x, y in zip(test_features, test_labels):
-            result, prob = self.predict(x)
-            predict.append([result, prob])
-            if result == y:
-                correct += 1
-        acc = correct / len(test_labels)
-        print(f"Accuracy: {acc * 100:.2f}%")
-        return acc, np.array(predict)
-
     def to_file(self, filename):
         data = {category: model.weights for category, model in self.models.items()}
-        data_str_keys = {str(key): value for key, value in data.items()}
-        np.savez(filename, **data_str_keys)
+        if self.xp.__name__ == "cupy":
+            data_str_keys = {str(key): value.get() for key, value in data.items()}
+        else:
+            data_str_keys = {str(key): value for key, value in data.items()}
+        self.xp.savez_compressed(filename, **data_str_keys)

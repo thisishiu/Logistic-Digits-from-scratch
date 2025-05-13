@@ -31,7 +31,8 @@ A one-vs-all strategy is used for multiclass classification:
 - Final output uses a softmax-like method to choose the most probable class.
 
 ### 3. Training
-The training logic is built inside the `Z` class (for binary) and `MultinomialLogistic` (for multiclass):
+The training logic is built inside the `Z` class (for binary) and `MultinomialLogistic` (for multiclass):  
+This model is trained on CPU (using NumPy, not supporting GPU).  
 
 ```python
 # file train.py
