@@ -82,7 +82,7 @@ class MultinomialLogistic:
         print("Training completed for all categories.")
 
     def softmax(self, x):
-        x = self.xp.hstack((np.ones((1, 1)), x))  # add bias term
+        x = self.xp.hstack((self.xp.ones((1, 1)), x))  # add bias term
         scores = {c: sigmoid(x @ self.models[c].weights, self.xp)[0, 0] for c in self.categories}
         total = sum(self.xp.exp(v) for v in scores.values())
         softmax_scores = {c: self.xp.exp(v) / total for c, v in scores.items()}
