@@ -70,7 +70,7 @@ class MultinomialLogistic:
         for category in self.categories:
             binary_labels = (self.labels == category).astype(float)
             model = Z(self.features, binary_labels, self.xp)
-            models[category] = model
+            models[int(category)] = model
         return models
 
     def train(self, learning_rate=0.1, epochs=10000):
