@@ -37,7 +37,7 @@ class Z:
         return f"Z(features size={self.features.shape}, labels size={self.labels.shape}, weights shape={self.weights.shape})"
 
     def train(self, learning_rate=2, epochs=10000):
-        print(f"Training with learning rate: {learning_rate}, epochs: {epochs} ({"GPU" if self.xp.__name__ == 'cupy' else 'CPU'})")
+        print(f"Training with learning rate: {learning_rate}, epochs: {epochs} ({'GPU' if self.xp.__name__ == 'cupy' else 'CPU'})")
         s = epochs // 2
         previous_loss = float('inf')
         for epoch in range(epochs + 1):
