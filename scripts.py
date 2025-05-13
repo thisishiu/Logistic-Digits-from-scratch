@@ -1,16 +1,16 @@
-def take_from(block, p):
+def take_from(block, p, reverse=False):
     """
     Take first p% of the block.
     Args:
         block (np.ndarray): The block to take from.
         p (float): The percentage to take.
     Returns:
-        np.ndarray: The block with the first p% taken.
+        np.ndarray: The block with be p% of data.
     """
     if p < 0 or p > 1:
         raise ValueError("p must be between 0 and 1")
     n = int(len(block) * p)
-    return block[:n]
+    return block[:n] if not reverse else block[-n:]
 
 def sigmoid(z, xp):
     z = xp.clip(z, -500, 500)
@@ -38,17 +38,16 @@ class Z:
 
     def train(self, learning_rate=2, epochs=10000):
         print(f"Training with learning rate: {learning_rate}, epochs: {epochs} ({'GPU' if self.xp.__name__ == 'cupy' else 'CPU'})")
-        s = epochs // 2
+        # s = epochs // 2
         previous_loss = float('inf')
         for epoch in range(epochs + 1):
-            if epoch % s == 0 and epoch != 0:
-                learning_rate *= 0.5
+            # if epoch % s == 0 and epoch != 0:
+            #     learning_rate *= 0.5
             z = self.features @ self.weights
             y_hat = sigmoid(z, self.xp)
             loss_value = loss(self.labels, y_hat, self.xp)
-            if abs(loss_value - previous_loss) < 1e-8:
-                print(f"Loss converged at epoch {epoch}: Loss = {loss_value:.4f}.")
-                break
+            if loss_value > previous_loss:
+                learning_rate *= 0.5
             previous_loss = loss_value
             self.weights -= learning_rate * dw(self.labels, y_hat, self.features)
             if (epoch/epochs)*100 % 10 == 0:

@@ -3,8 +3,8 @@ from scripts import *
 
 parser = argparse.ArgumentParser(description="Train logistic regression on GPU with CuPy")
 parser.add_argument('--gpu', action='store_true', help="Use GPU for training")
-parser.add_argument('--p', type=float, default=1, help="Percentage of data to use for training")
-parser.add_argument('--lr', type=float, default=5, help="Learning rate for training")
+parser.add_argument('--p', type=float, default=0.8, help="Percentage of data to use for training")
+parser.add_argument('--lr', type=float, default=8, help="Learning rate for training")
 parser.add_argument('--epochs', type=int, default=10000, help="Number of epochs for training")
 args = parser.parse_args()
 
@@ -60,9 +60,23 @@ print(f"Y shape: {Y.shape}")
 
 # Instantiate and train the model
 A = MultinomialLogistic(X, Y, xp)
-print("Training with {p*100}% of the data")
+print(f"Training with {p*100}% of the data")
 A.train(learning_rate=args.lr, 
         epochs=args.epochs)
 A.to_file('model')
 
 
+# Test the model
+print(f"Testing with {100-p*100}% of the data")
+X_test = take_from(images, 1-p, reverse=True)
+Y_test = take_from(labels, 1-p, reverse=True)
+X_test = X_test.reshape(X_test.shape[0], -1)
+X_test = X_test / 255.0
+print(f"X_test shape: {X_test.shape}")
+print(f"Y_test shape: {Y_test.shape}")
+count_true = 0
+for i in range(len(Y_test)):
+    y_hat, prob = A.predict(X_test[i])
+    if y_hat == Y_test[i]:
+        count_true += 1
+print(f"Accuracy: {count_true/len(Y_test)*100:.2f}%")

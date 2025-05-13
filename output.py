@@ -1,5 +1,5 @@
 import tkinter as tk
-from PIL import Image, ImageDraw, ImageOps
+from PIL import Image, ImageDraw, ImageOps, ImageTk
 import numpy as np
 
 class Model:
@@ -45,6 +45,10 @@ class App:
         self.result_label = tk.Label(self.root, text="Draw and press OK", font=('Arial', 14))
         self.result_label.pack()
 
+        # Label to show the resized image
+        self.image_label = tk.Label(self.root)
+        self.image_label.pack()
+
         self.image = Image.new("L", (self.canvas_size, self.canvas_size), color=255)
         self.draw = ImageDraw.Draw(self.image)
 
@@ -62,16 +66,22 @@ class App:
         self.result_label.config(text="Draw and press OK")
 
     def predict(self):
-        # Resize ảnh về 28x28
+        # Resize to 28x28
         small_img = self.image.resize((28, 28), Image.Resampling.LANCZOS)
         small_img = ImageOps.invert(small_img) 
         img_array = np.array(small_img) / 255.0 
         img_array = img_array.reshape(1, 28, 28)
         img_array = img_array.reshape(1, -1)
 
-        # Gọi hàm test từ class A
+        # Show the resized image
+        small_img = small_img.resize((280, 280), Image.Resampling.LANCZOS)
+        small_img_tk = ImageTk.PhotoImage(small_img)
+        self.image_label.config(image=small_img_tk)
+        self.image_label.image = small_img_tk
+
+        # Call the model to predict
         result, prob = A.predict(img_array)
-        self.result_label.config(text=result)
+        self.result_label.config(text=f"{result} ({prob}%)")
 
 if __name__ == "__main__":
     root = tk.Tk()
