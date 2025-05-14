@@ -1,6 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageDraw, ImageOps, ImageTk
 import numpy as np
+from process_image import *
 
 class Model:
     def __init__(self):
@@ -70,6 +71,7 @@ class App:
         small_img = self.image.resize((28, 28), Image.Resampling.LANCZOS)
         small_img = ImageOps.invert(small_img) 
         img_array = np.array(small_img) / 255.0 
+        img_array = re_center_image(img_array, size=28, xp=np)
         img_array = img_array.reshape(1, 28, 28)
         img_array = img_array.reshape(1, -1)
 

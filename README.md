@@ -10,19 +10,25 @@ This project implements a **multiclass logistic regression model from scratch** 
 - Entirely based on NumPy and built from first principles.
 
 ## Project Structure
+```
 .  
-├── train.py    # Main script: load data, train model, export model  
-├── scripts.py  # Core logic: logistic regression, training, prediction  
-├── data/       # MNIST dataset files (.idx format)  
-├── model.npz   # Saved model weights (after training)  
-├── output.py   # Testing model (using weight in model.npz)  
-└── README.md
-
+├── train.py            # Main script  
+├── scripts.py          # Core logic  
+├── process_image.py    # processing image before traing  
+├── data/               # MNIST dataset files (.idx format)  
+├── model.npz           # Saved model weights (after training)  
+├── output.py           # Testing model  
+└── README.md  
+```
 
 ## How It Works
 
-### 1. Data Loading
+### 1. Data Loading and Processing
 The `read_idx()` function loads MNIST data from raw `.idx` files into NumPy arrays.
+Each digit will be re-centered be before trainng.
+<p align="center">
+  <img src="demo_re_center.png" alt="Centering based on center of mass" width="300"/>
+</p>
 
 ### 2. Model
 A one-vs-all strategy is used for multiclass classification:
@@ -31,14 +37,11 @@ A one-vs-all strategy is used for multiclass classification:
 - Final output uses a softmax-like method to choose the most probable class.
 
 ### 3. Training
-The training logic is built inside the `Z` class (for binary) and `MultinomialLogistic` (for multiclass):  
-This model is trained on CPU (using NumPy, not supporting GPU).  
+The training logic is built inside the `Z` class (for binary) and `MultinomialLogistic` (for multiclass) 
 
-```python
-# file train.py
-A = MultinomialLogistic(X, Y)
-A.train(learning_rate=0.05, epochs=10000)  #<---- Can modify
-A.to_file("model.npz")
+```bash
+python train.py --lr 8 --epoch 10000 -p 0.8 --gpu
+# remove --gpu if train on cpu
 ```
 
 ### Tesing
@@ -47,3 +50,5 @@ The file `output.py` allows the user to draw and write a digit on the window, th
 <p align="center">
   <img src="demo.png" alt="Digit Drawing Demo" width="300"/>
 </p>
+
+This model using Multinomial Logistic Regession so the accurary is about ~92% (after tesing)

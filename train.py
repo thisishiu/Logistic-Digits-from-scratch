@@ -84,7 +84,7 @@ X_test = X_test / 255.0
 print(f"X_test shape: {X_test.shape}")
 print(f"Y_test shape: {Y_test.shape}")
 count_true = 0
-for i in range(len(Y_test)):
+for i in tqdm(range(len(Y_test)), desc="Testing model"):
     y_hat, prob = A.predict(X_test[i])
     if y_hat == Y_test[i]:
         count_true += 1

@@ -14,20 +14,23 @@ def re_center_image(image, size=28, xp=None):
     if xp is None:
         import numpy as np
         xp = np
-    
-    # Tìm trọng tâm (center of mass) của ảnh
+
+    # Center of mass
     binary = (image > 0.1).astype(float)
-    cy, cx = center_of_mass(binary)
+    if xp.__name__ == 'cupy':
+        binary_np = binary.get()
+    else:
+        binary_np = binary
+    cy, cx = center_of_mass(binary_np)
     
-    # Nếu ảnh toàn 0 (không có số), thì không cần xử lý
+    # Skip if image is empty
     if xp.isnan(cx) or xp.isnan(cy):
         return image.copy()
 
-    # Tính độ lệch cần dịch
+    # Calculate the shift
     shift_y = int(round(size // 2 - cy))
     shift_x = int(round(size // 2 - cx))
 
-    # Dịch ảnh bằng cách chép vùng dữ liệu
     shifted = xp.zeros_like(image)
     h, w = image.shape
 
