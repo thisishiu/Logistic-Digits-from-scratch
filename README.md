@@ -24,7 +24,7 @@ This project implements a **multiclass logistic regression model from scratch** 
 ## How It Works
 
 ### 1. Data Loading and Processing
-The `read_idx()` function loads MNIST data from raw `.idx` files into NumPy arrays.
+The `read_idx()` function loads MNIST data from raw `.idx` files into NumPy arrays.  
 Each digit will be re-centered be before trainng.
 <p align="center">
   <img src="demo_re_center.png" alt="Centering based on center of mass" width="300"/>
@@ -37,6 +37,7 @@ A one-vs-all strategy is used for multiclass classification:
 - Final output uses a softmax-like method to choose the most probable class.
 
 ### 3. Training
+There is a trained model available in the repo, skip if you don't need to see how it was trained.  
 The training logic is built inside the `Z` class (for binary) and `MultinomialLogistic` (for multiclass) 
 
 ```bash
@@ -45,7 +46,11 @@ python train.py --lr 8 --epoch 10000 -p 0.8 --gpu
 ```
 
 ### Tesing
-The file `output.py` allows the user to draw and write a digit on the window, then press OK. The result will be returned and printed out.
+
+```bash
+python output.py
+```
+File `output.py` allows the user to draw and write a digit on the window, then press OK. The result will be returned and printed out.
 
 <p align="center">
   <img src="demo.png" alt="Digit Drawing Demo" width="300"/>
