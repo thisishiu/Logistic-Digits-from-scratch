@@ -82,14 +82,16 @@ class MultinomialLogistic:
 
     def softmax(self, x):
         x = self.xp.hstack((self.xp.ones((1, 1)), x))  # add bias term
-        scores = {c: sigmoid(x @ self.models[c].weights, self.xp)[0, 0] for c in self.categories}
+        scores = {int(c): sigmoid(x @ self.models[int(c)].weights, self.xp)[0, 0] for c in self.categories}
         total = sum(self.xp.exp(v) for v in scores.values())
         softmax_scores = {c: self.xp.exp(v) / total for c, v in scores.items()}
         return softmax_scores
 
     def predict(self, x):
         probs = self.softmax(x.reshape(1, -1))
-        return max(probs, key=probs.get), round(probs[max(probs, key=probs.get)] * 100, 2)
+        best_class = max(probs, key=probs.get)
+        confidence = float(probs[best_class])
+        return best_class, round(confidence * 100, 2)
 
     def to_file(self, filename):
         data = {category: model.weights for category, model in self.models.items()}

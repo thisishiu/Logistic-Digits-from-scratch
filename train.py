@@ -1,5 +1,7 @@
 import argparse
+from tqdm import tqdm
 from scripts import *
+from  process_image import *
 
 parser = argparse.ArgumentParser(description="Train logistic regression on GPU with CuPy")
 parser.add_argument('--gpu', action='store_true', help="Use GPU for training")
@@ -48,6 +50,13 @@ print(f"Length of images: {len(images)}")
 print(f"Size of a single image: {images[0].shape}")
 print(f"Length of labels: {len(labels)}")
 print(f"Size of a single label: {labels[0].shape}")
+
+# Re-center images
+print("Re-centering images...")
+for i in tqdm(range(len(images)), desc="Re-centering images"):
+    images[i] = re_center_image(images[i], size=28, xp=xp)
+    
+print("Re-centering completed.")
 
 # Take p% of the data
 p = args.p
