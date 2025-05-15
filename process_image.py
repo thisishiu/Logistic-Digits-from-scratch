@@ -1,16 +1,6 @@
 from scipy.ndimage import center_of_mass
 
 def re_center_image(image, size=28, xp=None):
-    """
-    Di chuyển trọng tâm của số về chính giữa ảnh (size x size).
-
-    Args:
-        image (np.ndarray): Ảnh đầu vào (grayscale, 2D).
-        size (int): Kích thước đầu ra (mặc định: 28).
-    
-    Returns:
-        np.ndarray: Ảnh mới đã được canh giữa.
-    """
     if xp is None:
         import numpy as np
         xp = np

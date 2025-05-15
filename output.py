@@ -28,7 +28,7 @@ class App:
         self.root = root
         self.root.title("Draw here")
 
-        self.canvas_size = 280  # 10x scale của 28x28 để dễ vẽ
+        self.canvas_size = 280 
         self.image_size = 28
 
         self.canvas = tk.Canvas(self.root, width=self.canvas_size, height=self.canvas_size, bg='white')
@@ -73,15 +73,16 @@ class App:
         img_array = np.array(small_img) / 255.0 
         img_array = re_center_image(img_array, size=28, xp=np)
         img_array = img_array.reshape(1, 28, 28)
-        img_array = img_array.reshape(1, -1)
 
-        # Show the resized image
-        small_img = small_img.resize((280, 280), Image.Resampling.LANCZOS)
-        small_img_tk = ImageTk.PhotoImage(small_img)
-        self.image_label.config(image=small_img_tk)
-        self.image_label.image = small_img_tk
-
+        # Show the resized image in the Tkinter window
+        img_display = Image.fromarray((img_array[0] * 255).astype(np.uint8))
+        img_display = img_display.resize((280, 280), Image.Resampling.NEAREST)
+        tk_img = ImageTk.PhotoImage(img_display)
+        self.image_label.configure(image=tk_img)
+        self.image_label.image = tk_img  # Keep a reference
+    
         # Call the model to predict
+        img_array = img_array.reshape(1, -1)
         result, prob = A.predict(img_array)
         self.result_label.config(text=f"{result} ({prob}%)")
 
